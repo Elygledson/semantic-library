@@ -25,6 +25,14 @@ class Settings(BaseSettings):
             f"{self.POSTGRES_DB}"
         )
 
+    @property
+    def redis_url(self) -> str:
+        return (
+            f"redis://{self.REDIS_HOST}:"
+            f"{self.REDIS_PORT}/"
+            f"{self.REDIS_DB}"
+        )
+
     class Config:
         env_file = ".env",
         env_file_encoding = "utf-8"

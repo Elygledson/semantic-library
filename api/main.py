@@ -22,4 +22,4 @@ app.add_middleware(
 
 @app.get("/health", tags=["health"])
 async def healthcheck():
-    return {"status": "ok", "message": "API is running!"}
+    return {"status": "ok", "mensagem": "API esta executando!"}

@@ -1,9 +1,11 @@
+import uuid
+
 from typing import List
 from config import get_db
 from sqlalchemy.orm import Session
-from services import HybridSearchService
-from schemas import HybridSearchResultSchema
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Request, Response
+from services import HybridSearchService, OpenAIModelService
+from schemas import HybridSearchResultSchema, ChatOutputSchema, QuerySchema
 
 hybrid_search = APIRouter()
 
@@ -11,17 +13,42 @@ hybrid_search = APIRouter()
 @hybrid_search.get(
     "/busca",
     response_model=List[HybridSearchResultSchema],
-    summary="Lista todos os documentos mais relevantes"
+    summary="Lista todos os livros mais relevantes dado uma consulta"
 )
-def get_all_relevant_documents(consulta: str, limite: int = Query(default=10, ge=1), db: Session = Depends(get_db)):
+def get_all_relevant_books(query_schema: QuerySchema, db: Session = Depends(get_db)):
     """
     Retorna os documentos mais relevantes.
 
     Parâmetros:
-    - consulta (str): busca textual
+    - consulta (str): Busca textual
     - limite (int, opcional): Quantidade de documentos (default = 10).
 
     Retorna:
     - List[HybridSearchResultSchema]: Lista completa de documentos mais relevantes.
     """
-    return HybridSearchService(db).filter_by_relevance(consulta, limite)
+    return HybridSearchService(db).filter_by_relevance(query_schema.query, query_schema.limit)
+
+
+@hybrid_search.post(
+    "/conversacao",
+    response_model=ChatOutputSchema,
+    summary="Gera uma resposta da IA com base na pergunta fornecida sobre programação em Python."
+)
+def chat(query_schema: QuerySchema, request: Request, response: Response):
+    """
+    Gera uma resposta detalhada utilizando o modelo de linguagem configurado,
+    com base na pergunta fornecida pelo usuário.
+
+    Parâmetros:
+    - pergunta (str): Pergunta feita pelo usuário. O texto é processado pela IA para gerar uma resposta relevante.
+
+    Retorna:
+    - str: Resposta textual gerada pela IA com base na pergunta fornecida.
+    """
+    session_id: str | None = request.cookies.get("session")
+
+    if not session_id:
+        session_id = str(uuid.uuid4())
+        response.set_cookie(key="session", value=session_id)
+
+    return OpenAIModelService().generate_response(query_schema.query, session_id)

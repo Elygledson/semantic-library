@@ -1,8 +1,8 @@
-from typing import List
 from config import get_db
 from http import HTTPStatus
-from sqlalchemy.orm import Session
 from services import BookService
+from typing import List, Optional
+from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query
 from repositories import AuthenticationRepository
 from schemas import BookSchema, BookCreateSchema, PaginatedBooksSchema, UserProfileSchema
@@ -39,6 +39,10 @@ def create_book(book_create_schema: BookCreateSchema,
 )
 def get_all_paginated_books(pagina: int = Query(default=1, ge=1),
                             limite: int = Query(default=10, ge=1),
+                            titulo: Optional[str] = Query(
+                                default=None, description="Filtra por título (opcional)"),
+                            autor: Optional[str] = Query(
+                                default=None, description="Filtra por autor (opcional)"),
                             current_user: UserProfileSchema = Depends(
                                 AuthenticationRepository.get_current_user),
                             db: Session = Depends(get_db)):
@@ -52,7 +56,15 @@ def get_all_paginated_books(pagina: int = Query(default=1, ge=1),
     Retorna:
     - List[BookSchema]: Lista de livros da página solicitada.
     """
-    return BookService(db).get_all_paginated(pagina, limite)
+    filters = {}
+
+    if titulo:
+        filters['titulo'] = titulo
+
+    if autor:
+        filters['autor'] = autor
+
+    return BookService(db).get_all_paginated(pagina, limite, filters)
 
 
 @book.get(

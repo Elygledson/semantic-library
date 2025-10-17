@@ -1,8 +1,6 @@
 import math
 
 from models import Book
-from pytz import timezone
-from datetime import datetime
 from typing import List, Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload, Session
@@ -18,6 +16,7 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
         new_book = Book(author=book_create_schema.author,
                         title=book_create_schema.title,
                         summary=book_create_schema.summary,
+                        publication_date=book_create_schema.publication_date,
                         embedding=embedding)
 
         self.db.add(new_book)
@@ -26,7 +25,7 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
         return new_book
 
     def find_one(self, id: int) -> Optional[Book]:
-        return self.db.query(Book).filter(Book.id == id, Book.deleted_at.is_(None)).first()
+        return self.db.query(Book).filter(Book.id == id).first()
 
     def find_all(self, filters: Optional[dict] = None, relations: Optional[List[str]] = None) -> List[Book]:
         load_options = []
@@ -52,13 +51,26 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
 
         return query.all()
 
-    def find_all_paginated(self, page: int = 1, limit: int = 10) -> PaginatedResult[Book]:
-        total = self.db.query(Book).count()
+    def find_all_paginated(self, page: int = 1, limit: int = 10, filters: Optional[dict] = None) -> PaginatedResult[Book]:
+        query = self.db.query(Book)
 
+        if filters:
+            for field, value in filters.items():
+                if value is None or value == "":
+                    continue
+
+                if hasattr(Book, field):
+                    column = getattr(Book, field)
+                    if isinstance(value, str):
+                        query = query.filter(column.ilike(f"%{value}%"))
+                    else:
+                        query = query.filter(column == value)
+
+        total = query.count()
         offset = (page - 1) * limit
 
         itens = (
-            self.db.query(Book)
+            query
             .offset(offset)
             .limit(limit)
             .all()
@@ -68,10 +80,10 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
 
         return PaginatedResult(
             total=total,
-            pagina=page,
-            limite=limit,
-            itens=itens,
-            total_paginas=total_pages
+            page=page,
+            limit=limit,
+            items=itens,
+            total_pages=total_pages
         )
 
     def update(self, id: int, book_update_schema: BookUpdateSchema) -> Book:
@@ -87,8 +99,7 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
                     detail=f"Livro com id={id} não encontrado ou já excluído."
                 )
 
-            book.deleted_at = datetime.now(timezone.utc)
-            self.db.add(book)
+            self.db.delete(book)
             self.db.commit()
 
         except Exception as e:

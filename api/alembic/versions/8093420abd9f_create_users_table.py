@@ -30,7 +30,6 @@ def upgrade() -> None:
                   server_default=sa.func.now()),
         sa.Column('atualizado_em', sa.DateTime(),
                   nullable=False, server_default=sa.func.now()),
-        sa.Column('deletado_em', sa.DateTime(), nullable=True),
     )
 
     op.create_index('idx_usuarios_nome', 'usuarios', ['nome'])

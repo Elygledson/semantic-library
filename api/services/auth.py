@@ -22,7 +22,7 @@ class AuthService:
             user_profile_schema = UserProfileSchema.model_validate(
                 existing_user)
 
-            return LoginResponseSchema(usuario=user_profile_schema, token=access_token, tipo_token='Bearer')
+            return LoginResponseSchema(user=user_profile_schema, token=access_token, type='Bearer')
         except HTTPException as http_exc:
             raise http_exc
         except Exception as e:

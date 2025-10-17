@@ -28,14 +28,18 @@ class CRUDRepository(ABC, Generic[TModel, TCreate, TUpdate, TID]):
         pass
 
     @abstractmethod
-    def find_all(self, filters: Optional[dict] = None, relations: Optional[List[str]] = None) -> List[TModel]:
+    def find_all(self,
+                 filters: Optional[dict] = None,
+                 relations: Optional[List[str]] = None
+                 ) -> List[TModel]:
         pass
 
     @abstractmethod
     def find_all_paginated(
         self,
         page: int = 1,
-        limit: int = 10
+        limit: int = 10,
+        filters: Optional[dict] = None
     ) -> PaginatedResult[TModel]:
         pass
 

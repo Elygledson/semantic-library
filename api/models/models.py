@@ -25,7 +25,6 @@ class User(Base):
                         default=lambda: datetime.now(timezone('America/Sao_Paulo')))
     updated_at = Column("atualizado_em", DateTime, nullable=False,
                         default=lambda: datetime.now(timezone('America/Sao_Paulo')))
-    deleted_at = Column("deletado_em", DateTime, nullable=True)
 
 
 class Book(Base):
@@ -35,9 +34,9 @@ class Book(Base):
     author = Column("autor", String(100), nullable=False)
     title = Column("titulo", String(100), nullable=False)
     summary = Column("resumo", Text(), nullable=False)
-    embedding = Column("embedding", Vector(), nullable=False, index=True)
+    publication_date = Column("data_publicacao", DateTime, nullable=False)
+    embedding = Column("embedding", Vector(1536), nullable=False, index=True)
     created_at = Column("criado_em", DateTime, nullable=False, index=True,
                         default=lambda: datetime.now(timezone('America/Sao_Paulo')))
     updated_at = Column("atualizado_em", DateTime, nullable=False,
                         default=lambda: datetime.now(timezone('America/Sao_Paulo')))
-    deleted_at = Column("deletado_em", DateTime, nullable=True)

@@ -1,7 +1,6 @@
-from typing import List
-
 from models import Book
 from pydantic import TypeAdapter
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from services import OpenAIEmbeddingService
@@ -17,18 +16,17 @@ class BookService:
     def create(self, book_create_schema: BookCreateSchema) -> BookSchema:
         try:
             embedding: List[float] = self.embedding_service.generate_document_embedding(
-                book_create_schema.summary)
+                [book_create_schema.summary])
 
-            print(len(embedding), type(embedding))
-
-            book = self.book_repository.create(book_create_schema, embedding)
+            book = self.book_repository.create(
+                book_create_schema, embedding[0])
 
             return BookSchema.model_validate(book)
         except HTTPException as http_exc:
             raise http_exc
         except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Ocorreu um erro ao criar o documento. {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"Ocorreu um erro ao criar o documento. {e}")
 
     def get_one(self, book_id: int) -> BookSchema:
         book = self.book_repository.find_one(book_id)
@@ -45,9 +43,9 @@ class BookService:
         books = self.book_repository.find_all()
         return TypeAdapter(List[BookSchema]).validate_python(books)
 
-    def get_all_paginated(self, page: int, limit: int) -> PaginatedBooksSchema:
+    def get_all_paginated(self, page: int, limit: int, filters: Optional[dict] = None) -> PaginatedBooksSchema:
         paginated: PaginatedResult[Book] = self.book_repository.find_all_paginated(
-            page, limit)
+            page, limit, filters)
         return PaginatedBooksSchema.model_validate(paginated)
 
     def delete(self, book_id: int) -> None:

@@ -1,3 +1,4 @@
+from typing import List
 from abc import ABC, abstractmethod
 
 
@@ -7,5 +8,5 @@ class EmbeddingModel(ABC):
         pass
 
     @abstractmethod
-    def generate_document_embedding(self):
+    def generate_document_embedding(self, contents: List[str]) -> List[List[float]]:
         pass

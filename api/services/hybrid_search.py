@@ -24,6 +24,8 @@ class HybridSearchService:
         query_embedding: List[float] = self.embedding_service.generate_query_embedding(
             query_text)
 
+        print(query_embedding)
+
         semantic_subq = (
             select(
                 Book.id.label("id"),
