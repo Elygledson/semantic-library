@@ -5,15 +5,12 @@ class Settings(BaseSettings):
     REDIS_DB: str
     REDIS_HOST: str
     REDIS_PORT: str
-    SECRET_KEY: str
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_HOST: str
     POSTGRES_PORT: int
     POSTGRES_PASSWORD: str
     AI_SERVICE_KEY: str
-    SWAGGER_USERNAME: str
-    SWAGGER_PASSWORD: str
 
     @property
     def database_url(self) -> str:

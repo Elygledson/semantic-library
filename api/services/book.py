@@ -15,7 +15,7 @@ class BookService:
 
     def create(self, book_create_schema: BookCreateSchema) -> BookSchema:
         try:
-            embedding: List[float] = self.embedding_service.generate_document_embedding(
+            embedding: List[List[float]] = self.embedding_service.generate_document_embedding(
                 [book_create_schema.summary])
 
             book = self.book_repository.create(

@@ -1,15 +1,17 @@
 from config import settings
 from schemas import ChatOutputSchema
 from langchain_openai import ChatOpenAI
+from services import LLMModel, HybridSearchService
 from langchain_redis import RedisChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 
-class OpenAIModelService:
+class OpenAIModelService(LLMModel):
     def __init__(self):
         self.llm = ChatOpenAI(model='gpt-4o', api_key=settings.AI_SERVICE_KEY)
+        self.hybrid_search = HybridSearchService()
 
     def _get_redis_history(self, session_id: str) -> BaseChatMessageHistory:
         return RedisChatMessageHistory(session_id, redis_url=settings.redis_url)
@@ -42,7 +44,7 @@ class OpenAIModelService:
         chain = prompt | self.llm
 
         chain_with_history = RunnableWithMessageHistory(
-            chain, self.get_redis_history, input_messages_key="input", history_messages_key="history"
+            chain, self._get_redis_history, input_messages_key="input", history_messages_key="history"
         )
 
         response = chain_with_history.invoke(

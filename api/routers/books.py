@@ -4,8 +4,7 @@ from services import BookService
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query
-from repositories import AuthenticationRepository
-from schemas import BookSchema, BookCreateSchema, PaginatedBooksSchema, UserProfileSchema
+from schemas import BookSchema, BookCreateSchema, PaginatedBooksSchema
 
 book = APIRouter()
 
@@ -16,10 +15,7 @@ book = APIRouter()
     response_model=BookSchema,
     summary="Cria um novo livro"
 )
-def create_book(book_create_schema: BookCreateSchema,
-                current_user: UserProfileSchema = Depends(
-                    AuthenticationRepository.get_current_user),
-                db: Session = Depends(get_db)):
+def create_book(book_create_schema: BookCreateSchema, db: Session = Depends(get_db)):
     """
     Cria um novo livro no sistema.
 
@@ -43,8 +39,6 @@ def get_all_paginated_books(pagina: int = Query(default=1, ge=1),
                                 default=None, description="Filtra por título (opcional)"),
                             autor: Optional[str] = Query(
                                 default=None, description="Filtra por autor (opcional)"),
-                            current_user: UserProfileSchema = Depends(
-                                AuthenticationRepository.get_current_user),
                             db: Session = Depends(get_db)):
     """
     Retorna uma lista paginada de todos os livros.
@@ -72,8 +66,7 @@ def get_all_paginated_books(pagina: int = Query(default=1, ge=1),
     response_model=List[BookSchema],
     summary="Lista todos os livros"
 )
-def get_all_books(current_user: UserProfileSchema = Depends(AuthenticationRepository.get_current_user),
-                  db: Session = Depends(get_db)):
+def get_all_books(db: Session = Depends(get_db)):
     """
     Retorna todos os livros para o usuário autenticado.
 
@@ -88,10 +81,7 @@ def get_all_books(current_user: UserProfileSchema = Depends(AuthenticationReposi
     response_model=BookSchema,
     summary="Consulta livro por ID"
 )
-def get_one_book(id: int,
-                 current_user: UserProfileSchema = Depends(
-                     AuthenticationRepository.get_current_user),
-                 db: Session = Depends(get_db)):
+def get_one_book(id: int, db: Session = Depends(get_db)):
     """
     Retorna os detalhes de um livro específico pelo seu ID.
 
@@ -109,10 +99,7 @@ def get_one_book(id: int,
     status_code=HTTPStatus.NO_CONTENT,
     summary="Exclui um livro por ID"
 )
-def delete_book(id: int,
-                current_user: UserProfileSchema = Depends(
-                    AuthenticationRepository.get_current_user),
-                db: Session = Depends(get_db)):
+def delete_book(id: int, db: Session = Depends(get_db)):
     """
     Remove um livro específico pelo seu ID.
 

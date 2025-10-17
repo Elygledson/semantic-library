@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 class EmbeddingModel(ABC):
     @abstractmethod
-    def generate_query_embedding(self):
+    def generate_query_embedding(self, contents: str) -> List[float]:
         pass
 
     @abstractmethod

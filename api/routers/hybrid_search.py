@@ -10,7 +10,7 @@ from schemas import HybridSearchResultSchema, ChatOutputSchema, QuerySchema
 hybrid_search = APIRouter()
 
 
-@hybrid_search.get(
+@hybrid_search.post(
     "/busca",
     response_model=List[HybridSearchResultSchema],
     summary="Lista todos os livros mais relevantes dado uma consulta"
@@ -36,15 +36,15 @@ def get_all_relevant_books(query_schema: QuerySchema, db: Session = Depends(get_
 )
 def chat(query_schema: QuerySchema, request: Request, response: Response):
     """
-    Gera uma resposta detalhada utilizando o modelo de linguagem configurado,
-    com base na pergunta fornecida pelo usuário.
+    Endpoint responsável por gerar uma resposta detalhada da IA com base na pergunta fornecida.
 
     Parâmetros:
-    - pergunta (str): Pergunta feita pelo usuário. O texto é processado pela IA para gerar uma resposta relevante.
+    - query_schema (QuerySchema): Objeto contendo a pergunta feita pelo usuário.
 
     Retorna:
-    - str: Resposta textual gerada pela IA com base na pergunta fornecida.
+    - ChatOutputSchema: Objeto contendo a resposta textual gerada pela IA.
     """
+
     session_id: str | None = request.cookies.get("session")
 
     if not session_id:

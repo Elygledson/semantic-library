@@ -1,15 +1,12 @@
 from fastapi import FastAPI
+from routers import book, hybrid_search
 from fastapi.middleware.cors import CORSMiddleware
-from routers import authentication, setup_docs, book, hybrid_search
 
-app = FastAPI(title='COLEÇÃO DE LIVROS - DOT',
-              docs_url=None, redoc_url=None, openapi_url=None)
+app = FastAPI(title='COLEÇÃO DE LIVROS - TESTE')
 
-app.include_router(authentication, prefix='/api/v1', tags=['autenticacao'])
-app.include_router(hybrid_search, prefix='/api/v1', tags=['busca'])
+app.include_router(hybrid_search, prefix='/api/v1',
+                   tags=['busca e conversacao'])
 app.include_router(book, prefix='/api/v1', tags=['livros'])
-
-setup_docs(app)
 
 app.add_middleware(
     CORSMiddleware,

@@ -35,7 +35,7 @@ class HybridSearchService:
         )
 
         return semantic_subq
-    
+
     def _search_full_text(self, query_text: str, limit: int):
         """
         Realiza busca textual com PostgreSQL full-text search.
@@ -68,16 +68,16 @@ class HybridSearchService:
             .limit(limit)
             .subquery()
         )
-        
+
         return keyword_subq
-        
 
     def filter_by_relevance(self, query_text: str, limit: int, k: int = 10) -> List[HybridSearchResultSchema]:
         """
         Busca híbrida: combina semelhança de embeddings e busca textual.
         """
         semantic_subq = self._semantich_search(query_text, limit)
-        keyword_subq = self._search_full_text(query_text)
+        print('dasd', semantic_subq)
+        keyword_subq = self._search_full_text(query_text, limit)
 
         stmt = (
             select(
