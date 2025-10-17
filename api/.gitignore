@@ -2,5 +2,8 @@
 venv
 __pycache__
 static
-node_modules
-.vscode/
+*.db*
+*.jpg
+*.jpeg
+*.png
+*.gif
