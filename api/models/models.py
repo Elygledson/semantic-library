@@ -25,4 +25,6 @@ class Book(Base):
     created_at = Column("criado_em", DateTime, nullable=False, index=True,
                         default=lambda: datetime.now(timezone('America/Sao_Paulo')))
     updated_at = Column("atualizado_em", DateTime, nullable=False,
-                        default=lambda: datetime.now(timezone('America/Sao_Paulo')))
+                        default=lambda: datetime.now(
+                            timezone('America/Sao_Paulo')),
+                        onupdate=lambda: datetime.now(timezone("America/Sao_Paulo")))

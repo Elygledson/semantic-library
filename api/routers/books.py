@@ -4,7 +4,7 @@ from services import BookService
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query
-from schemas import BookSchema, BookCreateSchema, PaginatedBooksSchema
+from schemas import BookSchema, BookCreateSchema, BookUpdateSchema, PaginatedBooksSchema
 
 book = APIRouter()
 
@@ -59,6 +59,25 @@ def get_all_paginated_books(pagina: int = Query(default=1, ge=1),
         filters['author'] = autor
 
     return BookService(db).get_all_paginated(pagina, limite, filters)
+
+
+@book.patch(
+    "/livros/{id}",
+    response_model=BookSchema,
+    summary="Atualiza um livro parcialmente"
+)
+def update_book(id: int, book_update_schema: BookUpdateSchema, db: Session = Depends(get_db)):
+    """
+    Atualiza parcialmente os dados de um livro existente.
+
+    Parâmetros:
+    - id (int): Identificador único do livro a ser atualizado.
+    - book_update_schema (BookUpdateSchema): Dados a serem atualizados (campos opcionais).
+
+    Retorna:
+    - BookSchema: Dados atualizados do livro.
+    """
+    return BookService(db).update(id, book_update_schema)
 
 
 @book.get(

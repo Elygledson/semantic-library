@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -24,10 +24,10 @@ class BookCreateSchema(BaseModel):
 
 
 class BookUpdateSchema(BaseModel):
-    author: str = Field(..., alias="autor")
-    title: str = Field(..., alias="titulo")
-    summary: str = Field(..., alias="resumo")
-    publication_date: date = Field(..., alias="data_publicacao")
+    author: Optional[str] = Field(None, alias="autor")
+    title: Optional[str] = Field(None, alias="titulo")
+    summary: Optional[str] = Field(None, alias="resumo")
+    publication_date: Optional[date] = Field(None, alias="data_publicacao")
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True, json_schema_extra={
         "example": {

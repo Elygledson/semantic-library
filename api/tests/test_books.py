@@ -81,6 +81,19 @@ def test_get_all_paginated_books(client):
 
 
 @pytest.mark.order(5)
+def test_update_book(client):
+    payload = {
+        "autor": "J. K. Rowling - Atualizado",
+        "titulo": "Harry Potter e a Pedra Filosofal - Atualizado",
+    }
+    response = client.patch("api/v1/livros/1", json=payload)
+    assert response.status_code == HTTPStatus.OK
+    data = response.json()
+    assert data["titulo"] == payload["titulo"]
+    assert data["autor"] == payload["autor"]
+
+
+@pytest.mark.order(6)
 def test_delete_book(client):
     all_books = client.get("api/v1/livros").json()
     book_id = all_books[0]["id"]

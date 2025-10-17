@@ -13,16 +13,20 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
         self.db = db
 
     def create(self, book_create_schema: BookCreateSchema, embedding: List[float]) -> Book:
-        new_book = Book(author=book_create_schema.author,
-                        title=book_create_schema.title,
-                        summary=book_create_schema.summary,
-                        publication_date=book_create_schema.publication_date,
-                        embedding=embedding)
+        try:
+            new_book = Book(author=book_create_schema.author,
+                            title=book_create_schema.title,
+                            summary=book_create_schema.summary,
+                            publication_date=book_create_schema.publication_date,
+                            embedding=embedding)
 
-        self.db.add(new_book)
-        self.db.commit()
-        self.db.refresh(new_book)
-        return new_book
+            self.db.add(new_book)
+            self.db.commit()
+            self.db.refresh(new_book)
+            return new_book
+        except Exception as e:
+            self.db.rollback()
+            raise e
 
     def find_one(self, id: int) -> Optional[Book]:
         return self.db.query(Book).filter(Book.id == id).first()
@@ -87,7 +91,14 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
         )
 
     def update(self, id: int, book_update_schema: BookUpdateSchema) -> Book:
-        pass
+        try:
+            update_data = book_update_schema.model_dump(exclude_unset=True)
+            self.db.query(Book).filter(Book.id == id).update(update_data)
+            self.db.commit()
+            return self.find_one(id)
+        except Exception as e:
+            self.db.rollback()
+            raise e
 
     def delete(self, id: int) -> None:
         try:
@@ -101,7 +112,6 @@ class BookRepository(CRUDRepository[Book, BookCreateSchema, BookUpdateSchema, in
 
             self.db.delete(book)
             self.db.commit()
-
         except Exception as e:
             self.db.rollback()
             raise e
