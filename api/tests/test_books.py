@@ -61,6 +61,26 @@ def test_get_book_by_id(client):
 
 
 @pytest.mark.order(4)
+def test_get_all_paginated_books(client):
+    response = client.get(
+        "api/v1/livros/paginado",
+        params={
+            "pagina": 1,
+            "limite": 10,
+            "titulo": "Harry Potter",
+            "autor": "J. K. Rowling",
+        }
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    data = response.json()
+    assert len(data) >= 1
+    assert data['total'] == 1
+    assert data['limite'] == 10
+    assert data['total_paginas'] == 1
+
+
+@pytest.mark.order(5)
 def test_delete_book(client):
     all_books = client.get("api/v1/livros").json()
     book_id = all_books[0]["id"]
