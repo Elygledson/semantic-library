@@ -68,7 +68,7 @@ class PaginatedBooksSchema(BaseModel):
     items: List[BookSchema] = Field(..., alias="itens")
     total_pages: int = Field(..., alias="total_paginas")
 
-    model_config = ConfigDict(from_attributes=True, json_schema_extra={"json_schema_extra": {
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, json_schema_extra={"json_schema_extra": {
         "example": {
             "total": 2,
             "pagina": 1,

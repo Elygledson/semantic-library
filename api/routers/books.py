@@ -59,10 +59,10 @@ def get_all_paginated_books(pagina: int = Query(default=1, ge=1),
     filters = {}
 
     if titulo:
-        filters['titulo'] = titulo
+        filters['title'] = titulo
 
     if autor:
-        filters['autor'] = autor
+        filters['author'] = autor
 
     return BookService(db).get_all_paginated(pagina, limite, filters)
 

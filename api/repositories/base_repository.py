@@ -12,10 +12,10 @@ T = TypeVar("T")
 @dataclass
 class PaginatedResult(Generic[T]):
     total: int
-    pagina: int
-    limite: int
-    itens: List[T]
-    total_paginas: int
+    page: int
+    limit: int
+    items: List[T]
+    total_pages: int
 
 
 class CRUDRepository(ABC, Generic[TModel, TCreate, TUpdate, TID]):
