@@ -54,7 +54,7 @@ Após iniciar, a documentação da API pode ser acessada pelo Swagger:
 http://localhost:8000/docs
 ```
 
-Endpoints da API
+# Endpoints da API
 1. Cadastro de Livros – POST /livros
 
 Cria um novo livro no sistema.
@@ -112,3 +112,27 @@ curl --location 'http://localhost:8000/api/v1/livros' \
     "data_publicacao": "2021-07-15"
 }'
 ```
+
+# Rodando todos os testes
+
+Para executar os testes da aplicação usando pytest, basta rodar o comando:
+
+```bash
+pytest -v
+```
+
+O parâmetro -v ativa a saída detalhada dos testes.
+
+O pytest irá executar testes unitários (funções/métodos isolados) e testes de integração (endpoints da API usando TestClient).
+
+Tipos de testes incluídos
+
+🔹 Testes unitários
+
+Dependências externas como OpenAI ou Redis são substituídas por mocks usando unittest.mock.patch ou pytest-mock.
+
+Exemplo: testar o método _semantich_search de HybridSearchService com embeddings simuladas.
+
+🔹 Testes de integração
+
+Testam endpoints da API completos, verificando requisições HTTP, validação de payload e resposta.
