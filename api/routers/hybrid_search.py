@@ -31,7 +31,7 @@ def get_all_relevant_books(query_schema: QuerySchema, db: Session = Depends(get_
 @hybrid_search.post(
     "/conversacao",
     response_model=ChatOutputSchema,
-    summary="Gera uma resposta da IA com base na pergunta."
+    summary="Gera uma resposta da IA baseado nas informações relevantes recuperadas através da busca semântica."
 )
 def chat(query_schema: QuerySchema, request: Request, response: Response, db: Session = Depends(get_db)):
     """

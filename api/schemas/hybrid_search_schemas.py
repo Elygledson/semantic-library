@@ -23,7 +23,7 @@ class QuerySchema(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, json_schema_extra={
         "example": {
-            "pergunta": "Como fazer um loop for em Python?",
+            "pergunta": "Sobre o que o livro Alquimista fala?",
         }
     })
 
@@ -35,7 +35,7 @@ class ChatOutputSchema(BaseModel):
         populate_by_name=True,
         json_schema_extra={
             "example": {
-                "resposta": "A inteligência artificial pode transformar a educação ao personalizar o aprendizado e automatizar avaliações."
+                "resposta": "O livro \"O Alquimista\" conta a história de Santiago, um jovem pastor que embarca em uma jornada para encontrar um tesouro pessoal. Ele atravessa desertos e enfrenta diversos desafios ao longo de sua busca. A narrativa mistura elementos de aventura e filosofia, explorando temas como sonhos, destino, autoconhecimento e a realização do potencial humano. É uma obra que incentiva a reflexão sobre seguir os próprios sonhos e compreender o significado da vida."
             }
         }
     )
