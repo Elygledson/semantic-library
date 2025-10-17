@@ -12,9 +12,57 @@ class HybridSearchService:
         self.db = db
         self.embedding_service = OpenAIEmbeddingService()
 
-    def _semantich_search(self, query_text: str, limit: int):
+    def _semantich_search(self, query_text: str, limit: int) -> List[HybridSearchResultSchema]:
         """
         Realiza busca semântica com embeddings.
+        """
+        query_embedding: List[float] = self.embedding_service.generate_query_embedding(
+            query_text)
+
+        similarity = Book.embedding.cosine_distance(
+            query_embedding).label("pontuacao")
+
+        stmt = (
+            select(
+                Book.id,
+                Book.title.label('titulo'),
+                Book.summary.label('resumo'),
+                similarity
+
+            )
+            .where(similarity < 0.6)
+            .order_by(Book.embedding.cosine_distance(query_embedding))
+            .limit(limit)
+        )
+
+        results = self.db.execute(stmt).mappings().all()
+        return TypeAdapter(List[HybridSearchResultSchema]).validate_python(results)
+
+    def _search_full_text(self, query_text: str, limit: int):
+        """
+        Realiza busca textual com PostgreSQL full-text search.
+        """
+        ts_query = func.plainto_tsquery("portuguese", query_text)
+
+        stmt = (
+            select(
+                Book.id,
+                Book.title.label('titulo'),
+                Book.summary.label('resumo'),
+                func.ts_rank_cd(func.to_tsvector(
+                    "portuguese", Book.summary), ts_query).label("pontuacao")
+            )
+            .where(func.to_tsvector("portuguese", Book.summary).op("@@")(ts_query))
+            .order_by(func.ts_rank_cd(func.to_tsvector("portuguese", Book.summary), ts_query).desc())
+            .limit(limit)
+        )
+
+        results = self.db.execute(stmt).mappings().all()
+        return TypeAdapter(List[HybridSearchResultSchema]).validate_python(results)
+
+    def filter_by_relevance(self, query_text: str, limit: int, k: int = 10) -> List[HybridSearchResultSchema]:
+        """
+        Busca híbrida: combina semelhança de embeddings e busca textual.
         """
         query_embedding: List[float] = self.embedding_service.generate_query_embedding(
             query_text)
@@ -34,12 +82,6 @@ class HybridSearchService:
             .subquery()
         )
 
-        return semantic_subq
-
-    def _search_full_text(self, query_text: str, limit: int):
-        """
-        Realiza busca textual com PostgreSQL full-text search.
-        """
         ts_query = func.plainto_tsquery("portuguese", query_text)
 
         keyword_subq = (
@@ -68,16 +110,6 @@ class HybridSearchService:
             .limit(limit)
             .subquery()
         )
-
-        return keyword_subq
-
-    def filter_by_relevance(self, query_text: str, limit: int, k: int = 10) -> List[HybridSearchResultSchema]:
-        """
-        Busca híbrida: combina semelhança de embeddings e busca textual.
-        """
-        semantic_subq = self._semantich_search(query_text, limit)
-        print('dasd', semantic_subq)
-        keyword_subq = self._search_full_text(query_text, limit)
 
         stmt = (
             select(

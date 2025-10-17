@@ -2,7 +2,7 @@
 
 ## Descrição Geral do Projeto
 
-O projeto consiste em uma **API para gerenciamento e busca de livros**, com foco em **busca híbrida** (textual e semântica) e **interações de conversação**. Ele foi desenvolvido como parte de um estudo de caso para avaliar técnicas de **Processamento de Linguagem Natural (NLP)** e **busca vetorial**, combinando tecnologias como PostgreSQL com pgvector, Redis e Langchain. Além disso, inclui um **Jupyter Notebook com FAISS** para análise exploratória de similaridade entre documentos.
+O projeto consiste em uma **API para gerenciamento e busca de livros**, com foco em **busca híbrida** (textual e semântica) e **interações de conversação**. Ele foi desenvolvido como parte de um estudo de caso para avaliar técnicas de **Processamento de Linguagem Natural (NLP)** e **busca vetorial**, combinando tecnologias como PostgreSQL com pgvector, Redis e Langchain. Além disso, inclui um **Jupyter Notebook** para análise exploratória de similaridade entre documentos e prototipagem de chatbot.
 
 ### Funcionalidades Principais
 
@@ -10,8 +10,8 @@ O projeto consiste em uma **API para gerenciamento e busca de livros**, com foco
 - Busca híbrida que combina:
   - Busca textual tradicional (full-text)
   - Busca semântica por embeddings
-- Conversação contextualizada sobre programação em Python, utilizando histórico temporário de mensagens com Redis.
-- Prototipagem e análise de similaridade de documentos via Jupyter Notebook e FAISS.
+- Conversação contextualizada sobre os livros cadastrados baseado nos seus resumos, utilizando histórico temporário de mensagens com Redis.
+- Prototipagem de chatbot para programação em Python e análise de similaridade de documentos usando LangChain, OpenAI e FAISS.
 
 ---
 

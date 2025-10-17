@@ -20,8 +20,7 @@ def get_all_relevant_books(query_schema: QuerySchema, db: Session = Depends(get_
     Retorna os documentos mais relevantes.
 
     Parâmetros:
-    - consulta (str): Busca textual
-    - limite (int, opcional): Quantidade de documentos (default = 10).
+    - query_schema (QuerySchema): Objeto contendo a pergunta feita pelo usuário.
 
     Retorna:
     - List[HybridSearchResultSchema]: Lista completa de documentos mais relevantes.
@@ -32,9 +31,9 @@ def get_all_relevant_books(query_schema: QuerySchema, db: Session = Depends(get_
 @hybrid_search.post(
     "/conversacao",
     response_model=ChatOutputSchema,
-    summary="Gera uma resposta da IA com base na pergunta fornecida sobre programação em Python."
+    summary="Gera uma resposta da IA com base na pergunta."
 )
-def chat(query_schema: QuerySchema, request: Request, response: Response):
+def chat(query_schema: QuerySchema, request: Request, response: Response, db: Session = Depends(get_db)):
     """
     Endpoint responsável por gerar uma resposta detalhada da IA com base na pergunta fornecida.
 
@@ -51,4 +50,9 @@ def chat(query_schema: QuerySchema, request: Request, response: Response):
         session_id = str(uuid.uuid4())
         response.set_cookie(key="session", value=session_id)
 
-    return OpenAIModelService().generate_response(query_schema.query, session_id)
+    hybrid_search = HybridSearchService(db)
+
+    documents = hybrid_search._semantich_search(
+        query_text=query_schema.query, limit=5)
+
+    return OpenAIModelService().generate_response(query_schema.query, session_id, documents)

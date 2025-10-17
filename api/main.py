@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from routers import book, hybrid_search
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title='COLEÇÃO DE LIVROS - TESTE')
+app = FastAPI(title='BIBLIOTECA')
 
 app.include_router(hybrid_search, prefix='/api/v1',
                    tags=['busca e conversacao'])
